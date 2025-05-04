@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>K-Drama App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff0f5;
+      color: #000;
+      text-align: center;
+      padding: 30px;
+      transition: background-color 0.4s, color 0.4s;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: #f5f5f5;
+    }
+
+    h1 {
+      color: #d81b60;
+    }
+
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #d81b60;
+      border-radius: 8px;
+      margin: 5px;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #d81b60;
+      color: white;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background-color: #f8bbd0;
+      margin: 10px auto;
+      padding: 10px;
+      border-radius: 10px;
+      width: 60%;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
+
+    .dark-mode li {
+      background-color: #333;
+    }
+
+    img {
+      width: 60px;
+      border-radius: 8px;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🌸 My Favorite K-Dramas</h1>
+
+  <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+  <br><br>
+
+  <input type="text" id="searchBox" placeholder="Search..." onkeyup="filterDramas()">
+  <br><br>
+
+  <input type="text" id="newTitle" placeholder="New K-Drama Name">
+  <input type="text" id="newImage" placeholder="Image URL">
+  <button onclick="addDrama()">Add K-Drama</button>
+
+  <ul id="dramaList"></ul>
+
+  <script>
+    // Load from localStorage or use default list
+    let kdramas;
+
+    if (localStorage.getItem("kdramas")) {
+      kdramas = JSON.parse(localStorage.getItem("kdramas"));
+    } else {
+      kdramas = [
+        {
+          title: "Crash Landing on You",
+          image: "crash.WEBP"
+        },
+        {
+          title: "Goblin",
+          image: "goblin.WEBP"
+        },
+        {
+          title: "It's Okay to Not Be Okay",
+          image: "https://upload.wikimedia.org/wikipedia/en/d/d1/It%27s_Okay_to_Not_Be_Okay.png"
+        },
+        {
+          title: "Vincenzo",
+          image: "https://upload.wikimedia.org/wikipedia/en/1/13/Vincenzo_TV_series.jpg"
+        },
+        {
+          title: "True Beauty",
+          image: "https://upload.wikimedia.org/wikipedia/en/4/4e/True_Beauty_%28TV_series%29.png"
+        }
+      ];
+      saveToLocalStorage();
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem("kdramas", JSON.stringify(kdramas));
+    }
+
+    function displayDramas(list) {
+      const dramaList = document.getElementById("dramaList");
+      dramaList.innerHTML = "";
+
+      list.forEach((drama, index) => {
+        const item = document.createElement("li");
+
+        const img = document.createElement("img");
+        img.src = drama.image;
+        img.alt = drama.title;
+
+        const text = document.createElement("span");
+        text.textContent = drama.title;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "❌";
+        deleteBtn.style.marginLeft = "auto";
+        deleteBtn.style.backgroundColor = "#ff5252";
+        deleteBtn.style.border = "none";
+        deleteBtn.style.color = "white";
+        deleteBtn.style.borderRadius = "6px";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.onclick = () => {
+          kdramas.splice(index, 1);
+          saveToLocalStorage();
+          displayDramas(kdramas);
+        };
+
+        item.appendChild(img);
+        item.appendChild(text);
+        item.appendChild(deleteBtn);
+        dramaList.appendChild(item);
+      });
+    }
+
+    function filterDramas() {
+      const query = document.getElementById("searchBox").value.toLowerCase();
+      const filtered = kdramas.filter(d => d.title.toLowerCase().includes(query));
+      displayDramas(filtered);
+    }
+
+    function addDrama() {
+      const newTitle = document.getElementById("newTitle").value.trim();
+      const newImage = document.getElementById("newImage").value.trim();
+
+      if (newTitle && newImage) {
+        kdramas.push({ title: newTitle, image: newImage });
+        saveToLocalStorage();
+        displayDramas(kdramas);
+        document.getElementById("newTitle").value = "";
+        document.getElementById("newImage").value = "";
+      } else {
+        alert("Please enter both title and image URL.");
+      }
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    // Load the list
+    displayDramas(kdramas);
+  </script>
+</body>
+</html>
